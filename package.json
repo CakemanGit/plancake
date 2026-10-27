@@ -12,7 +12,8 @@
     "build": "tsc -p tsconfig.json",
     "start": "node dist/index.js",
     "deploy:commands": "tsx src/deploy-commands.ts",
-    "check": "tsc --noEmit -p tsconfig.json"
+    "check": "tsc --noEmit -p tsconfig.json",
+    "stop": "taskkill /f /fi \"IMAGENAME eq node.exe\" /fi \"WINDOWTITLE eq npm*\""
   },
   "dependencies": {
     "better-sqlite3": "^12.4.1",
