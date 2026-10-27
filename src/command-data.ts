@@ -1,6 +1,6 @@
 import { SlashCommandBuilder } from 'discord.js';
 
-export const commands: SlashCommandBuilder[] = [
+export const commands = [
   new SlashCommandBuilder()
     .setName('help')
     .setDescription('Показать справку по командам PlanCake'),
