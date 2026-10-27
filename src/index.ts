@@ -37,7 +37,7 @@ client.on(Events.InteractionCreate, async interaction => {
     const response = {
       embeds: [errorEmbed('Внутренняя ошибка', 'Во время выполнения команды произошла ошибка. Повтори попытку немного позже. Если проблема повторяется, проверь логи процесса.')],
       allowedMentions: { parse: [] as never[] },
-      ...(interaction.inGuild() ? { flags: MessageFlags.Ephemeral } : {}),
+      ...(interaction.inGuild() ? { flags: 64 } : {}),
     };
     try {
       if (interaction.replied || interaction.deferred) await interaction.followUp(response);
