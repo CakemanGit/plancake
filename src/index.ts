@@ -18,15 +18,21 @@ const client = new Client({
 });
 
 client.once(Events.ClientReady, readyClient => {
-  readyClient.user.setPresence({
-    activities: [{ name: 'планировки', type: ActivityType.Playing }],
-    status: 'online',
-  });
-  console.log(`[PlanCake] Вошёл как ${readyClient.user.tag}.`);
-  console.log('[PlanCake] Статус: Играет в планировки.');
-  console.log(`[PlanCake] База данных: ${config.databasePath}`);
-  startReminderLoop(readyClient);
+    // Получаем актуальное количество серверов из кэша
+    const serverCount = readyClient.guilds.cache.size;
+
+    readyClient.user.setPresence({
+        activities: [{ name: `за ${serverCount} серверами`, type: ActivityType.Watching }],
+        status: 'online',
+    });
+
+    console.log(`[PlanCake] Вошёл как ${readyClient.user.tag}.`);
+    console.log(`[PlanCake] Статус: Смотрит за серверами.`);
+    console.log(`[PlanCake] База данных: ${config.databasePath}`);
+    
+    startReminderLoop(readyClient);
 });
+
 
 client.on(Events.InteractionCreate, async interaction => {
   if (!interaction.isChatInputCommand()) return;
