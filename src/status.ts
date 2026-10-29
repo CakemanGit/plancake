@@ -5,11 +5,11 @@ dotenv.config();
 
 const client = new Client({
     intents: [GatewayIntentBits.Guilds],
-    // Настройки для быстрого восстановления сессии при сбоях сети из-за HiOS
     rest: { timeout: 30000, retries: 5 }
 });
 
 const STATUS_TEXT = '🥞 Хаваю блины и планирую 24/7!';
+let statusInterval: NodeJS.Timeout | null = null;
 
 function applyIronStatus(botClient: Client) {
     if (!botClient.user) return;
@@ -17,7 +17,7 @@ function applyIronStatus(botClient: Client) {
     try {
         botClient.user.setPresence({
             activities: [{
-                name: 'custom', 
+                name: 'Custom Status',
                 type: ActivityType.Custom,
                 state: STATUS_TEXT
             }],
@@ -29,13 +29,18 @@ function applyIronStatus(botClient: Client) {
     }
 }
 
-client.once('ready', () => {
+client.on('ready', () => {
     console.log(`Железобетонный статус-менеджер запущен для: ${client.user?.tag}`);
+    
+    // Сброс старого таймера при перезапуске сети
+    if (statusInterval) {
+        clearInterval(statusInterval);
+    }
+
     applyIronStatus(client);
 
-    // Интервал-киллер для агрессивного энергосбережения телефона.
-    // Каждые 5 минут шлем сигнал, что процесс активен, и обновляем статус.
-    setInterval(() => {
+    // Интервал-киллер
+    statusInterval = setInterval(() => {
         if (client.readyAt) {
             applyIronStatus(client);
         } else {
@@ -44,7 +49,8 @@ client.once('ready', () => {
     }, 5 * 60 * 1000);
 });
 
-// Защита от разрывов сессии (когда телефон на время отключает Wi-Fi/4G в фоне)
+
+// Защита от разрывов сессии
 client.on('shardDisconnect', () => {
     console.warn('Внимание: Shard отключен от сети. Ожидание восстановления...');
 });
@@ -53,12 +59,7 @@ client.on('shardReconnecting', () => {
     console.log('Попытка восстановить соединение с Discord...');
 });
 
-client.on('ready', () => {
-    // Вызывается также при успешном автоматическом реконнекте
-    applyIronStatus(client);
-});
-
-// КРИТИЧЕСКАЯ ЗАЩИТА: Не даем процессу упасть при любых системных или сетевых ошибках
+// КРИТИЧЕСКАЯ ЗАЩИТА: Не даем процессу упасть
 client.on('error', (err) => console.error('Ошибка Discord Client:', err));
 
 process.on('unhandledRejection', (reason, promise) => {
